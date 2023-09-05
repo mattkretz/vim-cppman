@@ -1,7 +1,7 @@
 # cppman.vim
 
 This is a vim plugin derived from cppman for opening cppreference documentation 
-in a new vertical split inside vim. Press <Leader>c (\c for me) with the cursor 
+in a new vertical split inside vim. Press \<Leader\>c (\c for me) with the cursor 
 over the identifier you want to look up.
 
 ## Installation
