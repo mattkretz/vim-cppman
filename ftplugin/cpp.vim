@@ -49,15 +49,6 @@ function s:reload()
   setl nomod
 endfunction
 
-function s:Rerender()
-  if winwidth(0) != b:old_col
-    let b:old_col = winwidth(0)
-    let save_cursor = getpos(".")
-    call s:reload()
-    call setpos('.', save_cursor)
-  end
-endfunction
-
 function! s:ParseIdent()
   let s = getline( '.' )
   let i = col( '.' ) - 1
@@ -159,7 +150,6 @@ function! s:Cppman(ident)
   setl colorcolumn=0
 
   let b:stack = []
-  let b:old_col = winwidth(0)
 
   call s:reload()
   normal! gg
@@ -174,7 +164,6 @@ function! s:Cppman(ident)
   map <buffer> <C-[> <C-o>
 
   let b:current_syntax = "man"
-  autocmd VimResized * call <SID>Rerender()
 endfunction
 
 nmap <Leader>c :call <SID>Cppman(<SID>ParseIdent())<CR>
