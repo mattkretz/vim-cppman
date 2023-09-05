@@ -58,8 +58,6 @@ function s:Rerender()
   end
 endfunction
 
-autocmd VimResized * call <SID>Rerender()
-
 function! s:ParseIdent()
   let s = getline( '.' )
   let i = col( '.' ) - 1
@@ -99,17 +97,19 @@ function! s:BackToPrevPage()
 endfunction
 
 function! OpenCpppage()
-  let ident = s:ParseIdent()
+endfunction
 
-  silent vertical new
+function! s:Cppman(ident)
+  silent vertical bo new
   silent vertical resize 80
 
-  let b:page_name = ident
+  let b:page_name = a:ident
   setl nonu
   setl nornu
   setl noma
-  setl keywordprg=cppman
   setl buftype=nofile
+  setl bufhidden=delete
+  setl noswapfile
 
   if version < 600
     syntax clear
@@ -169,11 +169,14 @@ function! OpenCpppage()
   map <buffer> <C-]> <S-K>
   map <buffer> <2-LeftMouse> <S-K>
 
-  noremap <buffer> <C-T> :call <SID>BackToPrevPage()<CR>
-  map <buffer> <RightMouse> <C-T>
-  map <buffer> <C-[> <C-T>
+  noremap <buffer> <C-o> :call <SID>BackToPrevPage()<CR>
+  map <buffer> <RightMouse> <C-o>
+  map <buffer> <C-[> <C-o>
 
   let b:current_syntax = "man"
+  autocmd VimResized * call <SID>Rerender()
 endfunction
 
-nmap <Leader>c :call OpenCpppage()<CR>
+nmap <Leader>c :call <SID>Cppman(<SID>ParseIdent())<CR>
+
+command! -nargs=+ Cppman call s:Cppman(expand(<q-args>))
