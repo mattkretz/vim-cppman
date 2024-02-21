@@ -146,7 +146,12 @@ function! s:CppmanOpen(id, key)
   else
     let ident = getbufline(winbufnr(a:id), a:key)[0]
   endif
+  let lastbuf = bufnr()
   silent vertical bo new
+  if (lastbuf == bufnr() || bufname() != "")
+    echoerr "Creating a new window & buffer failed for some reason. Aborting."
+    return
+  endif
   silent vertical resize 80
   let b:page_name = substitute(ident, " - .*$", "", "")
   setl nonu
