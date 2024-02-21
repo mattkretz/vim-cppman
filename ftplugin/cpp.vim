@@ -64,10 +64,38 @@ function! s:ParseIdent()
         \ "stdx::", "std::experimental::", "")
 endfunction
 
-function! s:LoadNewPage()
+function! s:MaybeLoadNewPage()
+
+  let page_names = systemlist("cppman -f ".s:ParseIdent())
+  if len(page_names) == 1
+    if page_names[0] =~ 'nothing appropriate'
+      call popup_notification(page_names[0], #{
+            \ pos: 'botleft',
+            \ line: 'cursor-1',
+            \ col: 'cursor',
+            \ moved: 'WORD',
+            \ })
+    else
+      call s:LoadNewPage(-1, page_names[0])
+    endif
+  else
+    call popup_menu(page_names, #{
+          \ callback: '<SID>LoadNewPage',
+          \ })
+  endif
+endfunction
+
+function! s:LoadNewPage(id, key)
+  if a:id < 0
+    let ident = a:key
+  elseif a:key < 0
+    return
+  else
+    let ident = getbufline(winbufnr(a:id), a:key)[0]
+  endif
   " Save current page to stack
   call add(b:stack, [b:page_name, getpos(".")])
-  let b:page_name = s:ParseIdent()
+  let b:page_name = substitute(ident, " - .*$", "", "")
   setl noro
   setl ma
   call s:reload()
@@ -91,10 +119,36 @@ function! OpenCpppage()
 endfunction
 
 function! s:Cppman(ident)
+  let page_names = systemlist("cppman -f ".a:ident)
+  if len(page_names) == 1
+    if page_names[0] =~ 'nothing appropriate'
+      call popup_notification(page_names[0], #{
+            \ pos: 'botleft',
+            \ line: 'cursor-1',
+            \ col: 'cursor',
+            \ moved: 'WORD',
+            \ })
+    else
+      call s:CppmanOpen(-1, page_names[0])
+    endif
+  else
+    call popup_menu(page_names, #{
+          \ callback: '<SID>CppmanOpen',
+          \ })
+  endif
+endfunction
+
+function! s:CppmanOpen(id, key)
+  if a:id < 0
+    let ident = a:key
+  elseif a:key < 0
+    return
+  else
+    let ident = getbufline(winbufnr(a:id), a:key)[0]
+  endif
   silent vertical bo new
   silent vertical resize 80
-
-  let b:page_name = a:ident
+  let b:page_name = substitute(ident, " - .*$", "", "")
   setl nonu
   setl nornu
   setl noma
@@ -154,7 +208,7 @@ function! s:Cppman(ident)
   call s:reload()
   normal! gg
 
-  noremap <buffer> <S-K> :call <SID>LoadNewPage()<CR>
+  noremap <buffer> <S-K> :call <SID>MaybeLoadNewPage()<CR>
   map <buffer> <CR> <S-K>
   map <buffer> <C-]> <S-K>
   map <buffer> <2-LeftMouse> <S-K>
