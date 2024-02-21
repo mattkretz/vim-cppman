@@ -39,10 +39,10 @@ function s:reload()
   echo "Loading... ".b:page_name
   silent exec "%d"
   let cppman = 'cppman --force-columns ' . winwidth(0)
-  silent exec "0r! ".cppman." '".b:page_name."'"
+  silent exec "0r! ".cppman." ".shellescape(b:page_name, 1)
   if getline(1) =~ '^No manual entry for ' && b:page_name =~ '_[tv]$'
     silent exec "%d"
-    silent exec "0r! ".cppman." '".b:page_name[:-3]."'"
+    silent exec "0r! ".cppman." ".shellescape(b:page_name[:-3], 1)
   endif
   setl ro
   setl noma
