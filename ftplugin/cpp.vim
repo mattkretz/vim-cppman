@@ -38,11 +38,13 @@ function s:reload()
   setl ma
   echo "Loading... ".b:page_name
   silent exec "%d"
-  let cppman = 'cppman --force-columns ' . winwidth(0)
+  let cppman = expand('<script>:p:h:h').'/cppman_wrapper.sh --force-columns ' . winwidth(0)
   silent exec "0r! ".cppman." ".shellescape(b:page_name, 1)
   if getline(1) =~ '^No manual entry for ' && b:page_name =~ '_[tv]$'
     silent exec "%d"
     silent exec "0r! ".cppman." ".shellescape(b:page_name[:-3], 1)
+  else
+    silent exec "normal! ggd/^NAME$\<CR>"
   endif
   setl ro
   setl noma
