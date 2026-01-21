@@ -1,2 +1,4 @@
 #!/bin/sh
-echo 1|cppman "$@"
+n=$1
+shift
+echo $n|cppman "$@"
